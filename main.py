@@ -26,6 +26,9 @@ class AddWidget(QWidget, Ui_Form):
         self.reset()
         self.btn()
 
+    def abcd(self):
+        pass
+
     def btn(self):
         self.name_btn.clicked.connect(self.add_name)
         self.url_btn.clicked.connect(self.add_url)
