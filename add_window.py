@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QWidget,
                              QFileDialog,
                              QMessageBox)
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, Qt
 from design.py.macros_add import Ui_Form
 
 
@@ -18,6 +18,7 @@ class AddWidget(QWidget, Ui_Form):
         self.initUI()
 
     def initUI(self):
+        self.setWindowModality(Qt.ApplicationModal)
         self.reset()
         self.btn()
 

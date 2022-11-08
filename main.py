@@ -24,9 +24,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.add_btn.clicked.connect(self.add_macros)
 
     def add_macros(self):
-        self.add = add_window.AddWidget()
-        self.add.show()
-        self.add.login_data[list].connect(self.add_to_database)
+        self.Window = add_window.AddWidget()
+        self.Window.show()
+        self.Window.login_data[list].connect(self.add_to_database)
 
     def del_macros(self, data):
         pass
@@ -43,6 +43,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         con.commit()
         con.close()
 
+        self.add_combination()
+
     def add_combination(self):
         con = sqlite3.connect('macros_db.sqlite')
         cur = con.cursor()
@@ -52,6 +54,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             keyboard.add_hotkey(hotkey, lambda x=url: os.startfile(x))
 
         con.close()
+
+    def table_update(self):
+        pass
 
 
 if __name__ == '__main__':
