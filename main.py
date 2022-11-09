@@ -1,12 +1,13 @@
 import sys
 import keyboard
 import sqlite3
-import os
+import subprocess
 
 import add_window
 
 from PyQt5.QtWidgets import (QApplication,
-                             QMainWindow)
+                             QMainWindow,
+                             QTableWidgetItem)
 from design.py.macros import Ui_MainWindow
 
 
@@ -39,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cur = con.cursor()
 
         cur.execute("""INSERT INTO macros(name, combination, file_name, url_file) VALUES(?, ?, ?, ?)""",
-                    (data[0], data[2], os.path.basename(r'{}'.format(data[1])), data[1]))
+                    (data[0], data[2], data[1].split('/')[-1], data[1]))
         con.commit()
         con.close()
 
@@ -51,12 +52,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         data = cur.execute("""SELECT combination, url_file FROM macros""").fetchall()
         for hotkey, url in data:
-            keyboard.add_hotkey(hotkey, lambda x=url: os.startfile(x))
+            keyboard.add_hotkey(hotkey, lambda x=url: subprocess.call(x, shell=True))
 
         con.close()
+        self.table_update()
 
     def table_update(self):
-        pass
+        con = sqlite3.connect('macros_db.sqlite')
+        cur = con.cursor()
+        data = cur.execute("""SELECT id, name, combination, file_name FROM macros""").fetchall()
+        con.close()
+
+        self.macros_table.setRowCount(0)
+        for i, row in enumerate(data):
+            self.macros_table.setRowCount(self.macros_table.rowCount() + 1)
+            for j, elem in enumerate(row[1::]):
+                self.macros_table.setItem(i, j, QTableWidgetItem(elem))
+        self.macros_table.resizeColumnsToContents()
 
 
 if __name__ == '__main__':

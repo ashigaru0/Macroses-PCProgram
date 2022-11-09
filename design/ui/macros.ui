@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
+    <width>540</width>
     <height>561</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>201</width>
+      <width>141</width>
       <height>41</height>
      </rect>
     </property>
@@ -32,7 +32,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>201</width>
+      <width>141</width>
       <height>41</height>
      </rect>
     </property>
@@ -45,7 +45,7 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>201</width>
+      <width>141</width>
       <height>41</height>
      </rect>
     </property>
@@ -56,12 +56,81 @@
    <widget class="QTableWidget" name="macros_table">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>160</x>
       <y>10</y>
-      <width>241</width>
-      <height>501</height>
+      <width>371</width>
+      <height>511</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>261</width>
+      <height>501</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>411</width>
+      <height>511</height>
+     </size>
+    </property>
+    <property name="sortingEnabled">
+     <bool>false</bool>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>122</number>
+    </attribute>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>49</number>
+    </attribute>
+    <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderStretchLastSection">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>33</number>
+    </attribute>
+    <attribute name="verticalHeaderMinimumSectionSize">
+     <number>23</number>
+    </attribute>
+    <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderStretchLastSection">
+     <bool>false</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>Название макроса</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Комбинация клавиш</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Название файла</string>
+     </property>
+     <property name="textAlignment">
+      <set>AlignCenter</set>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -69,7 +138,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>483</width>
+     <width>540</width>
      <height>21</height>
     </rect>
    </property>
