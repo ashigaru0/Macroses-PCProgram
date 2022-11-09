@@ -38,7 +38,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_to_database(self, data):
         con = sqlite3.connect('macros_db.sqlite')
         cur = con.cursor()
-
         cur.execute("""INSERT INTO macros(name, combination, file_name, url_file) VALUES(?, ?, ?, ?)""",
                     (data[0], data[2], data[1].split('/')[-1], data[1]))
         con.commit()
@@ -49,12 +48,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_combination(self):
         con = sqlite3.connect('macros_db.sqlite')
         cur = con.cursor()
-
         data = cur.execute("""SELECT combination, url_file FROM macros""").fetchall()
+        con.close()
+
         for hotkey, url in data:
             keyboard.add_hotkey(hotkey, lambda x=url: subprocess.call(x, shell=True))
 
-        con.close()
         self.table_update()
 
     def table_update(self):
