@@ -6,24 +6,9 @@ import subprocess
 import add_window
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QApplication,
-                             QMainWindow,
-                             QTableWidgetItem,
-                             QMessageBox,
-                             QFileDialog)
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import *
 from design.py.macros import Ui_MainWindow
-
-
-def my_excepthook(type, value, tback):
-    QtWidgets.QMessageBox.critical(
-        window, "CRITICAL ERROR", str(value),
-        QMessageBox.Cancel
-    )
-
-    sys.__excepthook__(type, value, tback)
-
-
-sys.excepthook = my_excepthook
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -34,13 +19,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def initUI(self):
         self.modified = []
-        self.TITLES = {0: 'name', 1: 'combination', 2: 'file_name', 3: 'url_file'}
+        self.TITLES = {0: 'name', 1: 'combination', 2: 'file_name', 4: 'url_file', 3: 'working'}
+        self.tray()
+        self.setFixedSize(self.size())
         self.add_combination()
         self.btn()
 
     def btn(self):
         self.add_btn.clicked.connect(self.add_macros)
-        self.del_btn.clicked.connect(self.del_macros)
+        self.del_btn.clicked.connect(self.deact_act_macros)
         self.change_btn.clicked.connect(self.change_macros)
         self.macros_table.itemChanged.connect(self.item_changed)
         self.macros_table.doubleClicked.connect(self.item_double_clicked)
@@ -50,8 +37,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.Window.show()
         self.Window.login_data[list].connect(self.add_to_database)
 
-    def del_macros(self):
-        pass
+    def deact_act_macros(self):
+        row = self.macros_table.currentRow()
+        text = self.macros_table.item(row, 3).text()
+        value = None
+        if text == 'Активирован':
+            value = 'Деактивирован'
+        elif text == 'Деактивирован':
+            value = 'Активирован'
+        self.macros_table.setItem(row, 3, QTableWidgetItem(value))
 
     def change_macros(self):
         if self.modified:
@@ -79,8 +73,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_to_database(self, data):
         con = sqlite3.connect('macros_db.sqlite')
         cur = con.cursor()
-        cur.execute("""INSERT INTO macros(name, combination, file_name, url_file) VALUES(?, ?, ?, ?)""",
-                    (data[0], data[2], data[1].split('/')[-1], data[1]))
+
+        okey = []
+        macroses = cur.execute("""SELECT name, combination, url_file FROM macros""").fetchall()
+        for macros in macroses:
+            for item in data:
+                if item in macros:
+                    okey.append(False)
+                else:
+                    okey.append(True)
+
+        if all(okey):
+            cur.execute("""INSERT INTO macros(name, combination, file_name, url_file, working) VALUES(?, ?, ?, ?, ?)""",
+                        (data[0], data[2], data[1].split('/')[-1], data[1], 'Активирован'))
+        else:
+            self.message('Макрос с такими же значениями уже существует')
+
+
         con.commit()
         con.close()
 
@@ -93,14 +102,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         con.close()
 
         for hotkey, url in data:
-            keyboard.add_hotkey(hotkey, lambda x=url: subprocess.call(x, shell=True))
+            keyboard.add_hotkey(hotkey, lambda x=url: self.open_file(x))
 
         self.table_update()
+
+    def open_file(self, url):
+        con = sqlite3.connect('macros_db.sqlite')
+        cur = con.cursor()
+        data = cur.execute("""SELECT working FROM macros
+                              WHERE url_file = ?""", (url, )).fetchone()
+        con.close()
+
+        if data[0] == 'Активирован':
+            subprocess.call(url, shell=True)
 
     def table_update(self):
         con = sqlite3.connect('macros_db.sqlite')
         cur = con.cursor()
-        data = cur.execute("""SELECT name, combination, file_name, url_file FROM macros""").fetchall()
+        data = cur.execute("""SELECT name, combination, file_name, working, url_file FROM macros""").fetchall()
         con.close()
 
         self.macros_table.setRowCount(0)
@@ -118,7 +137,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             item_hotkey = QTableWidgetItem(hotkey)
             item_hotkey.setFlags(Qt.ItemIsEnabled)
             self.macros_table.setItem(item.row(), item.column(), item_hotkey)
-        elif item.column() == 3:
+        elif item.column() == 4:
             url = self.add_url()
             if url:
                 item_file = QTableWidgetItem(url.split('/')[-1])
@@ -146,9 +165,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         message.setText(text)
         message.exec_()
 
+    def tray(self):
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QIcon('icon.png'))
+
+        show_action = QAction("Показать", self)
+        quit_action = QAction("Выход", self)
+        hide_action = QAction("Свернуть", self)
+
+        show_action.triggered.connect(self.show)
+        hide_action.triggered.connect(self.hide)
+        quit_action.triggered.connect(qApp.quit)
+
+        tray_menu = QMenu()
+        tray_menu.addAction(show_action)
+        tray_menu.addAction(hide_action)
+        tray_menu.addAction(quit_action)
+
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+
+    def closeEvent(self, event):
+        if self.tray_cb.isChecked():
+            event.ignore()
+            self.hide()
+            self.tray_icon.showMessage(
+                "Tray Program",
+                "Application was minimized to Tray",
+                QSystemTrayIcon.Information,
+                2000
+            )
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MainWindow()
+    app.setWindowIcon(QIcon('icon.png'))
     ex.show()
     sys.exit(app.exec_())

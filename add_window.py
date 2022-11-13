@@ -18,6 +18,7 @@ class AddWidget(QWidget, Ui_Form):
         self.initUI()
 
     def initUI(self):
+        self.setWindowTitle('Добавить макрос')
         self.setWindowModality(Qt.ApplicationModal)
         self.reset()
         self.btn()

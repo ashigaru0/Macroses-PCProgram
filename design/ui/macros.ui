@@ -7,13 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>850</width>
-    <height>446</height>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Макросы</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
@@ -56,6 +59,11 @@
        </column>
        <column>
         <property name="text">
+         <string>Работоспособность</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>Адрес файла</string>
         </property>
        </column>
@@ -66,7 +74,7 @@
        <item>
         <widget class="QPushButton" name="del_btn">
          <property name="text">
-          <string>Удалить выбранный(е) макрос(ы)</string>
+          <string>Активитовать/деактевировать выбранный(е) макрос(ы)</string>
          </property>
         </widget>
        </item>
@@ -78,6 +86,13 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="6" column="0">
+      <widget class="QCheckBox" name="tray_cb">
+       <property name="text">
+        <string>Сворачивать в трей при закрытии</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
