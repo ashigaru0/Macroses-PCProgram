@@ -18,7 +18,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setWindowIcon(QIcon('icon.ico'))
+        self.setWindowIcon(QIcon('data/icon.png'))
         self.modified = []
         self.TITLES = {0: 'name', 1: 'combination', 2: 'file_name', 4: 'url_file', 3: 'working'}
         self.tray()
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def add_macros(self):
         self.Window = add_window.AddWidget()
+        self.Window.setWindowIcon(QIcon('data/icon.png'))
         self.Window.show()
         self.Window.login_data[list].connect(self.add_to_database)
 
@@ -167,7 +168,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def tray(self):
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon('icon.png'))
+        self.tray_icon.setIcon(QIcon('data/icon.png'))
 
         show_action = QAction("Показать", self)
         quit_action = QAction("Выход", self)
@@ -175,7 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         show_action.triggered.connect(self.show)
         hide_action.triggered.connect(self.hide)
-        quit_action.triggered.connect(qApp.quit)
+        quit_action.triggered.connect(QApplication.quit)
 
         tray_menu = QMenu()
         tray_menu.addAction(show_action)
@@ -189,12 +190,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.tray_cb.isChecked():
             event.ignore()
             self.hide()
-            self.tray_icon.showMessage(
-                "Tray Program",
-                "Application was minimized to Tray",
-                QSystemTrayIcon.Information,
-                2000
-            )
 
 
 if __name__ == '__main__':
