@@ -24,20 +24,6 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="0">
-      <widget class="QPushButton" name="del_btn">
-       <property name="text">
-        <string>Удалить макрос(ы)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QPushButton" name="change_btn">
-       <property name="text">
-        <string>Изменить макрос(ы)</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="add_btn">
        <property name="text">
@@ -74,6 +60,24 @@
         </property>
        </column>
       </widget>
+     </item>
+     <item row="5" column="0">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="del_btn">
+         <property name="text">
+          <string>Удалить выбранный(е) макрос(ы)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="change_btn">
+         <property name="text">
+          <string>Подтвердить изменения макроса(ов)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>

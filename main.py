@@ -5,11 +5,25 @@ import subprocess
 
 import add_window
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication,
                              QMainWindow,
                              QTableWidgetItem,
-                             QMessageBox)
+                             QMessageBox,
+                             QFileDialog)
 from design.py.macros import Ui_MainWindow
+
+
+def my_excepthook(type, value, tback):
+    QtWidgets.QMessageBox.critical(
+        window, "CRITICAL ERROR", str(value),
+        QMessageBox.Cancel
+    )
+
+    sys.__excepthook__(type, value, tback)
+
+
+sys.excepthook = my_excepthook
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -19,7 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
 
     def initUI(self):
-        self.modified = {}
+        self.modified = []
         self.TITLES = {0: 'name', 1: 'combination', 2: 'file_name', 3: 'url_file'}
         self.add_combination()
         self.btn()
@@ -44,17 +58,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             con = sqlite3.connect('macros_db.sqlite')
             cur = con.cursor()
 
-            for id in self.modified.keys():
+            data = cur.execute("""SELECT combination FROM macros""").fetchall()
+            for hotkey in data:
+                keyboard.remove_hotkey(hotkey[0])
+
+            for change in self.modified:
                 que = "UPDATE macros SET\n"
-                que += f"{self.TITLES[self.modified[id][1]]} = '{self.modified[id][0]}'\n"
-                que += f'WHERE id = {id}'
+                que += f"{self.TITLES[change[1]]} = '{change[2]}'\n"
+                que += f'WHERE id = {change[0]}'
                 print(que)
                 cur.execute(que)
 
             con.commit()
             con.close()
-            self.modified.clear()
+            self.add_combination()
             self.table_update()
+            self.modified = []
+            self.message('Готово')
 
     def add_to_database(self, data):
         con = sqlite3.connect('macros_db.sqlite')
@@ -87,16 +107,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i, row in enumerate(data):
             self.macros_table.setRowCount(self.macros_table.rowCount() + 1)
             for j, elem in enumerate(row):
-                self.macros_table.setItem(i, j, QTableWidgetItem(elem))
+                item = QTableWidgetItem(elem)
+                if j > 0:
+                    item.setFlags(Qt.ItemIsEnabled)
+                self.macros_table.setItem(i, j, item)
 
     def item_double_clicked(self, item):
         if item.column() == 1:
             hotkey = self.add_comb()
-            self.modified[item.row() + 1] = [hotkey, item.column()]
-            self.macros_table.cha
+            item_hotkey = QTableWidgetItem(hotkey)
+            item_hotkey.setFlags(Qt.ItemIsEnabled)
+            self.macros_table.setItem(item.row(), item.column(), item_hotkey)
+        elif item.column() == 3:
+            url = self.add_url()
+            if url:
+                item_file = QTableWidgetItem(url.split('/')[-1])
+                item_url = QTableWidgetItem(url)
+                item_url.setFlags(Qt.ItemIsEnabled)
+                item_file.setFlags(Qt.ItemIsEnabled)
+                self.macros_table.setItem(item.row(), item.column() - 1, item_file)
+                self.macros_table.setItem(item.row(), item.column(), item_url)
 
     def item_changed(self, item):
-        self.modified[item.row() + 1] = [item.text(), item.column()]
+        self.modified.append([item.row() + 1, item.column(), item.text()])
 
     def add_comb(self):
         self.message('Нажмите комбинацию клавишь')
@@ -105,9 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return hotkey
 
     def add_url(self):
-        url = QFileDialog.getOpenFileName(self, 'Выбрать файл', '', 'Все файлы (*)')[0]
-        self.output[1] = url
-        self.url_btn.setText(url)
+        return QFileDialog.getOpenFileName(self, 'Выбрать файл', '', 'Все файлы (*)')[0]
 
     def message(self, text):
         message = QMessageBox()
