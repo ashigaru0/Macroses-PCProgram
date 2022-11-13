@@ -18,6 +18,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initUI()
 
     def initUI(self):
+        self.setWindowIcon(QIcon('icon.ico'))
         self.modified = []
         self.TITLES = {0: 'name', 1: 'combination', 2: 'file_name', 4: 'url_file', 3: 'working'}
         self.tray()
@@ -39,13 +40,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def deact_act_macros(self):
         row = self.macros_table.currentRow()
-        text = self.macros_table.item(row, 3).text()
-        value = None
-        if text == 'Активирован':
-            value = 'Деактивирован'
-        elif text == 'Деактивирован':
-            value = 'Активирован'
-        self.macros_table.setItem(row, 3, QTableWidgetItem(value))
+        if row != -1:
+            text = self.macros_table.item(row, 3).text()
+            value = None
+            if text == 'Активирован':
+                value = 'Деактивирован'
+            elif text == 'Деактивирован':
+                value = 'Активирован'
+            self.macros_table.setItem(row, 3, QTableWidgetItem(value))
 
     def change_macros(self):
         if self.modified:
@@ -60,7 +62,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 que = "UPDATE macros SET\n"
                 que += f"{self.TITLES[change[1]]} = '{change[2]}'\n"
                 que += f'WHERE id = {change[0]}'
-                print(que)
                 cur.execute(que)
 
             con.commit()
@@ -89,7 +90,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.message('Макрос с такими же значениями уже существует')
 
-
         con.commit()
         con.close()
 
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         con = sqlite3.connect('macros_db.sqlite')
         cur = con.cursor()
         data = cur.execute("""SELECT working FROM macros
-                              WHERE url_file = ?""", (url, )).fetchone()
+                              WHERE url_file = ?""", (url,)).fetchone()
         con.close()
 
         if data[0] == 'Активирован':
@@ -200,6 +200,5 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = MainWindow()
-    app.setWindowIcon(QIcon('icon.png'))
     ex.show()
     sys.exit(app.exec_())
